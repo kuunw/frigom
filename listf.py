@@ -3,12 +3,13 @@ import csv
 import string
 from datetime import date
 import datetime
+from turtle import reset
 
 (
     ITEM_NAME,
     ITEM_DATE,
     ITEM_MASS,
-    ITEM_CAT
+    PROP_PROTEIN
 ) = range(4)
 
 class item():
@@ -28,10 +29,12 @@ class listf():
     def addItem(self,item) -> None:
         self.inventory.append(item)
         self.refreshList()
+        self.saveList()
 
     def deleteItem(self,index) -> None:
-        self.inventory.remove(self.findItemByIndex(index))
+        del self.inventory[index]
         self.refreshList()
+        self.saveList()
 
     def findItemByIndex(self,index) -> item:
         for item in self.inventory:
@@ -46,12 +49,12 @@ class listf():
         with open(path, newline='') as csvfile:
             spamreader = csv.reader(csvfile, delimiter=';', quotechar='|')
             for row in spamreader:
-                  self.addItem(item(row[ITEM_NAME],row[ITEM_DATE],row[ITEM_MASS],row[ITEM_CAT]))
+                  self.addItem(item(row[ITEM_NAME],row[ITEM_DATE],row[ITEM_MASS],row[PROP_PROTEIN]))
 
     def saveList(self,path='inventory.csv') -> None:
         with open(path, "w") as csvfile:
             for item in self.inventory:
-                itemOutput = item.itemName+";"+item.itemDate+";"+item.itemMass+";"+str(item.propProtein)
+                itemOutput = item.itemName+";"+item.itemDate+";"+str(item.itemMass)+";"+str(item.propProtein)
                 csvfile.write(itemOutput+"\n")
     
     def almostUseBy(self,horizon=3):
@@ -66,13 +69,9 @@ class listf():
         return res
 
     def showList(self) -> None:
-        pass
-
-## Test
-list = listf()
-item1 = item("steak","2022-04-18","240",70)
-item2 = item("steak2","2022-04-19","240",70)
-list.addItem(item1)
-list.addItem(item2)
-list.saveList()
-print(list.almostUseBy())
+        res = "No item in the fridge"
+        if len(self.inventory) > 0:
+            res = ''
+            for item in self.inventory:
+                res = res + str(item.index) + "|\t" + item.itemName + '\t' + item.itemDate + '\t' + str(item.itemMass) + '\t' + str(item.propProtein) + '\n'
+        return res
